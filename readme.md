@@ -1,28 +1,16 @@
-NUM -> d
-NUM -> NUM + d
-HALF_FLOAT -> NUM + "."
-FLOAT -> HALF_FLOAT + d
-FLOAT -> FLOAT + d
+# Pyminus Compiler
 
-SYMBOL -> symb(~"=", "*")
-HALF_MULTIPLY -> "*"
-POWER -> "*" + "*"
-HALF_MULTIPLY -> "*"
+This is an LL(1) compiler for a custom language called `PyMinus` or `Py-`.
 
+## How to Run
 
-ID -> alph
-ID -> ID + alph
-ID -> ID + NUM
+Write the program in `input.txt` file next in the main directory. Then run:
 
-SIGNLE_COMMENT -> #
-SIGNLE_COMMENT -> SIGNLE_COMMENT + d
-SIGNLE_COMMENT -> SIGNLE_COMMENT + alph
-SIGNLE_COMMENT -> SIGNLE_COMMENT + sign
+```
+pip install anytree # only the first time, to install dependancies 
+python compiler.py
+```
 
-HALF_COMMENT -> "/*"
-HALF_COMMENT -> "/*" + d
-HALF_COMMENT -> "/*" + alph
-HALF_COMMENT -> "/*" + sign
-HALF_COMMENT -> "/*" + "\n"
-HALF_COMMENT -> "/*" + d
-MULTI_COMMENT -> HALF_COMMENT + "*/"
+## Requirements
+
+- Python (>= 3.6)
