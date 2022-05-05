@@ -1,4 +1,3 @@
-from cmath import log
 from scanner import Scanner
 
 
@@ -13,9 +12,9 @@ class Parser:
 
 
     def parse(self):
-        while(len(self.parse_stack) is not 0 and self.get_token_value(self.current_token) is not '$'):
+        while(len(self.parse_stack) is not 0):
             self.proceed()
-        print(self.errors)
+        self.write_errors()
 
 
     def proceed(self):
@@ -34,7 +33,7 @@ class Parser:
                 self.handle_empty_error()
                 return
             move = states_moves[self.get_token_value(self.current_token)]
-            if(move == 'Synch'):
+            if(move == ['Synch']):
                 self.handle_synch_error()
             else:
                 self.apply_rule(move[::-1])
@@ -46,6 +45,7 @@ class Parser:
             token = self.scanner.get_next_token()
         self.current_token = token
 
+
     def apply_rule(self, rule_tokens):
         self.parse_stack.pop()
         self.parse_stack = self.parse_stack + rule_tokens
@@ -56,9 +56,11 @@ class Parser:
         self.tree_rules.append(self.current_token[1])
         self.get_next_input()
 
+
     def accept_epsilon(self):
         self.parse_stack.pop()
         self.tree_rules.append('epsilon')
+
 
     def handle_synch_error(self):
         print('SYNCH ERROR')
@@ -66,20 +68,30 @@ class Parser:
         error = (self.scanner.line_no, 'missing ' + str(term))
         self.errors.append(error)
 
+
     def handle_terminal_error(self):
         print('TERM ERROR')
-        expected_token = self.parse_stack[::-1][0]
-        error = (self.scanner.line_no, 'missing ', str(expected_token))
+        expected_token = self.parse_stack.pop()
+        error = (self.scanner.line_no, 'missing ' + str(expected_token))
         self.errors.append(error)
-        self.parse_stack.pop()
+
 
     def handle_empty_error(self):
         print('MPT ERROR')
-        error = (self.scanner.line_no, 'illegal ' + str(self.current_token[0]))
+        error = (self.scanner.line_no, 'illegal ' + str(self.get_token_value(self.current_token)))
         self.errors.append(error)
         self.get_next_input()
 
+
     def get_token_value(self, token):
         return token[1] if token[0] in {'KEYWORD', 'SYMBOL', 'EOF'} else token[0]
-            
-        
+    
+
+    def write_errors(self):
+        file = open('syntax_errors.txt', 'w')
+        if self.errors:
+            formatted_error = map(lambda error: '#{0} : syntax error, {1}'.format(*error), self.errors)
+            file.write("\n".join(formatted_error))
+        else:
+            file.write("There is no syntax error.")
+        file.close()
