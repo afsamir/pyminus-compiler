@@ -198,7 +198,7 @@ parse_table = {
         '<': ['<'],
         'NUM': ['Synch'],
         },
-    'Arguments': {'ID': ['Expression', 'Arguments_Prime'], ')': ['Synch'
+    'Arguments': {'ID': ['Expression', 'Arguments_Prime'], ')': ['Epsilon'
                   ], 'NUM': ['Expression', 'Arguments_Prime']},
     'List_Rest': {']': ['Epsilon'], ',': [',', 'Expression', 'List_Rest'
                   ]},

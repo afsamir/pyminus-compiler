@@ -22,14 +22,14 @@ class Parser:
 
 
     def proceed(self):
-        # print(self.current_token, self.parse_stack)
+        print(self.current_token, self.parse_stack)
         if self.parse_stack[-1] == 'Epsilon':
             working_node = self.tree_stack.pop(0)
             working_node.name = 'epsilon'
             self.accept_epsilon()
         elif self.parse_stack[-1] == self.get_token_value(self.current_token):
             working_node = self.tree_stack.pop(0)
-            print(self.current_token)
+            # print(self.current_token)
             working_node.name = self.current_token
             self.accept_token()
         else:
@@ -78,21 +78,21 @@ class Parser:
 
 
     def handle_synch_error(self):
-        # print('SYNCH ERROR')
+        print('SYNCH ERROR')
         term = self.parse_stack.pop()
         error = (self.scanner.line_no, 'missing ' + str(term))
         self.errors.append(error)
 
 
     def handle_terminal_error(self):
-        # print('TERM ERROR')
+        print('TERM ERROR')
         expected_token = self.parse_stack.pop()
         error = (self.scanner.line_no, 'missing ' + str(expected_token))
         self.errors.append(error)
 
 
     def handle_empty_error(self):
-        # print('MPT ERROR')
+        print('MPT ERROR')
         error = (self.scanner.line_no, 'illegal ' + str(self.get_token_value(self.current_token)))
         self.errors.append(error)
         self.get_next_input()
@@ -114,4 +114,4 @@ class Parser:
     def write_parse_tree(self):
         with open('parse_tree.txt', 'w', encoding='utf-8') as f:
             for pre, _, node in RenderTree(self.tree_root):
-                f.write(f"{pre}{node.name}\n")
+                f.write(f"{pre}{node.name}\n".replace("\'",""))
