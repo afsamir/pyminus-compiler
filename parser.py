@@ -62,7 +62,6 @@ class Parser:
 
     def handle_synch_error(self):
         print('SYNCH ERROR')
-
         term = self.parse_stack.pop()
         error = (self.scanner.line_no, 'missing ' + str(term))
         self.errors.append(error)
@@ -76,7 +75,6 @@ class Parser:
 
     def handle_empty_error(self):
         print('MPT ERROR')
-
         error = (self.scanner.line_no, 'illegal ' + str(self.current_token[0]))
         self.errors.append(error)
         self.get_next_input()
