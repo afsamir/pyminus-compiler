@@ -13,7 +13,7 @@ class Parser:
 
 
     def parse(self):
-        while(len(self.parse_stack) is not 0 and self.current_token[0] is not '$'):
+        while(len(self.parse_stack) is not 0 and self.get_value(self.current_token) is not '$'):
             self.proceed()
         print(self.errors)
 
@@ -22,17 +22,18 @@ class Parser:
         print(self.current_token, self.parse_stack)
         if self.parse_stack[-1] == 'Epsilon':
             self.accept_epsilon()
-        elif self.parse_stack[-1] == self.current_token[0]:
+        elif self.parse_stack[-1] == self.get_value(self.current_token):
             self.accept_token()
         else:
             if self.parse_stack[-1] not in self.parse_table.keys():
                 self.handle_terminal_error()
                 return
             states_moves = self.parse_table[self.parse_stack[-1]]
-            if self.current_token[0] not in states_moves:
+            if self.get_value(self.current_token) not in states_moves:
+                print(self.get_value(self.current_token))
                 self.handle_empty_error()
                 return
-            move = states_moves[self.current_token[0]]
+            move = states_moves[self.get_value(self.current_token)]
             if(move == 'Synch'):
                 self.handle_synch_error()
             else:
@@ -43,8 +44,6 @@ class Parser:
         token = self.scanner.get_next_token()
         while token[0] in {'WHITESPACE', 'COMMENT'}:
             token = self.scanner.get_next_token()
-        if token[0] in {'KEYWORD', 'SYMBOL', 'EOF'}:
-            token = token[1], token[1]
         self.current_token = token
 
     def apply_rule(self, rule_tokens):
@@ -81,3 +80,8 @@ class Parser:
         error = (self.scanner.line_no, 'illegal ' + str(self.current_token[0]))
         self.errors.append(error)
         self.get_next_input()
+
+    def get_value(self, token):
+        return token[1] if token[0] in {'KEYWORD', 'SYMBOL', 'EOF'} else token[0]
+            
+        
