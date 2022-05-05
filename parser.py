@@ -13,7 +13,7 @@ class Parser:
 
 
     def parse(self):
-        while(len(self.parse_stack) is not 0 and self.get_value(self.current_token) is not '$'):
+        while(len(self.parse_stack) is not 0 and self.get_token_value(self.current_token) is not '$'):
             self.proceed()
         print(self.errors)
 
@@ -22,18 +22,18 @@ class Parser:
         print(self.current_token, self.parse_stack)
         if self.parse_stack[-1] == 'Epsilon':
             self.accept_epsilon()
-        elif self.parse_stack[-1] == self.get_value(self.current_token):
+        elif self.parse_stack[-1] == self.get_token_value(self.current_token):
             self.accept_token()
         else:
             if self.parse_stack[-1] not in self.parse_table.keys():
                 self.handle_terminal_error()
                 return
             states_moves = self.parse_table[self.parse_stack[-1]]
-            if self.get_value(self.current_token) not in states_moves:
-                print(self.get_value(self.current_token))
+            if self.get_token_value(self.current_token) not in states_moves:
+                print(self.get_token_value(self.current_token))
                 self.handle_empty_error()
                 return
-            move = states_moves[self.get_value(self.current_token)]
+            move = states_moves[self.get_token_value(self.current_token)]
             if(move == 'Synch'):
                 self.handle_synch_error()
             else:
@@ -81,7 +81,7 @@ class Parser:
         self.errors.append(error)
         self.get_next_input()
 
-    def get_value(self, token):
+    def get_token_value(self, token):
         return token[1] if token[0] in {'KEYWORD', 'SYMBOL', 'EOF'} else token[0]
             
         
