@@ -1,3 +1,4 @@
+from cmath import log
 from scanner import Scanner
 
 
@@ -14,24 +15,28 @@ class Parser:
     def parse(self):
         while(len(self.parse_stack) is not 0 and self.current_token[0] is not '$'):
             self.proceed()
+        print(self.errors)
 
 
     def proceed(self):
         print(self.current_token, self.parse_stack)
-        if(self.current_token[0] == self.parse_stack[-1]):
+        if self.parse_stack[-1] == 'Epsilon':
+            self.accept_epsilon()
+        elif self.parse_stack[-1] == self.current_token[0]:
             self.accept_token()
-        elif self.parse_stack[-1] == 'Epsilon':
-            self.parse_stack.pop()
         else:
-            try:
-                move = self.parse_table[self.parse_stack[-1]][self.current_token[0]]
-                if(move):
-                    if(move == 'Synch'):
-                        self.handle_synch_error()
-                    else:
-                        self.apply_rule(move[::-1])
-            except :
+            if self.parse_stack[-1] not in self.parse_table.keys():
+                self.handle_terminal_error()
+                return
+            states_moves = self.parse_table[self.parse_stack[-1]]
+            if self.current_token[0] not in states_moves:
                 self.handle_empty_error()
+                return
+            move = states_moves[self.current_token[0]]
+            if(move == 'Synch'):
+                self.handle_synch_error()
+            else:
+                self.apply_rule(move[::-1])
 
 
     def get_next_input(self):
@@ -50,16 +55,29 @@ class Parser:
     def accept_token(self):
         self.parse_stack.pop()
         self.tree_rules.append(self.current_token[1])
-        print(self.current_token)
         self.get_next_input()
+
+    def accept_epsilon(self):
+        self.parse_stack.pop()
+        self.tree_rules.append('epsilon')
 
     def handle_synch_error(self):
+        print('SYNCH ERROR')
+
         term = self.parse_stack.pop()
-        error = (self.scanner.line_no, 'missing' + str(term))
+        error = (self.scanner.line_no, 'missing ' + str(term))
         self.errors.append(error)
+
+    def handle_terminal_error(self):
+        print('TERM ERROR')
+        expected_token = self.parse_stack[::-1][0]
+        error = (self.scanner.line_no, 'missing ', str(expected_token))
+        self.errors.append(error)
+        self.parse_stack.pop()
 
     def handle_empty_error(self):
-        error = (self.scanner.line_no, 'missing')
+        print('MPT ERROR')
+
+        error = (self.scanner.line_no, 'illegal ' + str(self.current_token[0]))
         self.errors.append(error)
         self.get_next_input()
-
