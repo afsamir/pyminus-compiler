@@ -1,7 +1,7 @@
 ### author_name, student_no = 'Amir Afsari', 96105575
 
 from scanner import Scanner 
-from parser_component import Parser
+from parser import Parser
 
 parse_table = {
             '$': {'Program': ['Statements'], 'Statements': ['Epsilon']},
@@ -48,6 +48,8 @@ parse_table = {
                       'Statement': ['Compound_stmt'], 'Compound_stmt': ['Iteration_stmt'],
                       'Iteration_stmt': ['while', '(', 'Relational_Expression', ')', 'Statements']},
             '==': {'Relop': ['=='], 'Expression_Prime': ['Epsilon'], 'Term_Prime': ['Epsilon'],
+                   'Power': ['Primary'], 'Primary': ['Epsilon']},
+            '<': {'Relop': ['<'], 'Expression_Prime': ['Epsilon'], 'Term_Prime': ['Epsilon'],
                    'Power': ['Primary'], 'Primary': ['Epsilon']},
             '+': {'Expression_Prime': ['+', 'Term', 'Expression_Prime'], 'Term_Prime': ['Epsilon'],
                   'Power': ['Primary'], 'Primary': ['Epsilon']},

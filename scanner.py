@@ -138,7 +138,7 @@ class Scanner:
         if next in SYMBOLS: 
             self.go_back()
             return self.id_or_keyword(current)
-        if next in {'#', '/'}: 
+        if next in {'#', '/', '=', '*'}: 
             self.go_back()
             return self.id_or_keyword(current)
         else:

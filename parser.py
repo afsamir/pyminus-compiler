@@ -20,16 +20,17 @@ class Parser:
     def apply_rule(self, rule_tokens):
         self.parse_stack.pop()
         self.parse_stack = self.parse_stack + rule_tokens
-        pass
+        self.tree_rules.append(rule_tokens[::-1])
 
     def accept_token(self):
         terminal = self.parse_stack.pop()
-        print(terminal)
+        self.tree_rules.append(self.current_token[1])
+        print(self.current_token)
         self.get_next_input()
 
     def proceed(self):
         # print('__________________________________________________________________________')
-        print(self.current_token[0], self.parse_stack)
+        print(self.current_token, self.parse_stack)
         # print(self.current_token[0])
         # print(self.parse_table[self.current_token[0]])
         # print('__________________________________________________________________________')
@@ -45,5 +46,5 @@ class Parser:
                 raise Exception()
 
     def parse(self):
-        while(self.current_token[0] is not 'EOF'):
+        while(len(self.parse_stack) is not 0 and self.current_token[0] is not 'EOF'):
             self.proceed()

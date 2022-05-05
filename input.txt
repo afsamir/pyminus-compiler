@@ -1,13 +1,25 @@
-def main () :
-    a = 0**2;
-    # comment1
-    a = 2 + 2.5;
-    a = a - 3;
-    cde = a;
-    if b /* comment2 */ == 3 :
-        a = 3;
-    else 
-    : 
-        b = a ;
-        cde = 2;
-    return;/* comment 3*/
+# test case 2
+
+def main():
+    a = 0;
+    b = 10;
+    while (a < 7)
+        a = a + 1;
+        b = b - 1;
+    ;
+    return b;
+    ;
+
+def isTwo(a):
+    if a == 2:
+      return 1;
+    else:
+      return 0;
+    ;
+    ;
+
+l = [1, 2, 3, 4];
+a = isTwo(main());
+b = isTwo(l[1]);
+output(a);
+output(b);
