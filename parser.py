@@ -1,4 +1,5 @@
 from scanner import Scanner
+from anytree import Node, RenderTree
 
 
 class Parser:
@@ -8,32 +9,44 @@ class Parser:
         self.parse_stack = ['Program']
         self.tree_rules = []
         self.errors = []
+        self.tree_root = Node('Program')
+        self.tree_stack = [self.tree_root]
         self.get_next_input()
 
 
     def parse(self):
-        while(len(self.parse_stack) is not 0):
+        while(len(self.parse_stack) != 0):
             self.proceed()
         self.write_errors()
+        self.write_parse_tree()
 
 
     def proceed(self):
-        print(self.current_token, self.parse_stack)
+        # print(self.current_token, self.parse_stack)
         if self.parse_stack[-1] == 'Epsilon':
+            working_node = self.tree_stack.pop(0)
+            working_node.name = 'epsilon'
             self.accept_epsilon()
         elif self.parse_stack[-1] == self.get_token_value(self.current_token):
+            working_node = self.tree_stack.pop(0)
+            print(self.current_token)
+            working_node.name = self.current_token
             self.accept_token()
         else:
             if self.parse_stack[-1] not in self.parse_table.keys():
+                # working_node = self.tree_stack.pop(0)
+                # working_node.parent = None
                 self.handle_terminal_error()
                 return
             states_moves = self.parse_table[self.parse_stack[-1]]
             if self.get_token_value(self.current_token) not in states_moves:
-                print(self.get_token_value(self.current_token))
+                # print(self.get_token_value(self.current_token))
                 self.handle_empty_error()
                 return
             move = states_moves[self.get_token_value(self.current_token)]
             if(move == ['Synch']):
+                # working_node = self.tree_stack.pop(0)
+                # working_node.parent = None
                 self.handle_synch_error()
             else:
                 self.apply_rule(move[::-1])
@@ -49,6 +62,8 @@ class Parser:
     def apply_rule(self, rule_tokens):
         self.parse_stack.pop()
         self.parse_stack = self.parse_stack + rule_tokens
+        l = self.tree_stack.pop(0)
+        self.tree_stack = [Node(r, parent=l) for r in rule_tokens] + self.tree_stack
         self.tree_rules.append(rule_tokens[::-1])
 
     def accept_token(self):
@@ -63,21 +78,21 @@ class Parser:
 
 
     def handle_synch_error(self):
-        print('SYNCH ERROR')
+        # print('SYNCH ERROR')
         term = self.parse_stack.pop()
         error = (self.scanner.line_no, 'missing ' + str(term))
         self.errors.append(error)
 
 
     def handle_terminal_error(self):
-        print('TERM ERROR')
+        # print('TERM ERROR')
         expected_token = self.parse_stack.pop()
         error = (self.scanner.line_no, 'missing ' + str(expected_token))
         self.errors.append(error)
 
 
     def handle_empty_error(self):
-        print('MPT ERROR')
+        # print('MPT ERROR')
         error = (self.scanner.line_no, 'illegal ' + str(self.get_token_value(self.current_token)))
         self.errors.append(error)
         self.get_next_input()
@@ -95,3 +110,8 @@ class Parser:
         else:
             file.write("There is no syntax error.")
         file.close()
+
+    def write_parse_tree(self):
+        with open('parse_tree.txt', 'w', encoding='utf-8') as f:
+            for pre, _, node in RenderTree(self.tree_root):
+                f.write(f"{pre}{node.name}\n")
