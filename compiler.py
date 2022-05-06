@@ -6,7 +6,7 @@ from parser import Parser
 from parse_table import parse_table
 
 
-scanner = Scanner("input.txt")
+scanner = Scanner("./input.txt")
 parser = Parser(scanner, parse_table)
 
 parser.parse()

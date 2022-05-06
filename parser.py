@@ -22,7 +22,7 @@ class Parser:
 
 
     def proceed(self):
-        print(self.current_token, self.parse_stack)
+        # print(self.current_token, self.parse_stack)
         if self.parse_stack[-1] == 'Epsilon':
             working_node = self.tree_stack.pop(0)
             working_node.name = 'epsilon'
@@ -34,8 +34,6 @@ class Parser:
             self.accept_token()
         else:
             if self.parse_stack[-1] not in self.parse_table.keys():
-                # working_node = self.tree_stack.pop(0)
-                # working_node.parent = None
                 self.handle_terminal_error()
                 return
             states_moves = self.parse_table[self.parse_stack[-1]]
@@ -45,8 +43,8 @@ class Parser:
                 return
             move = states_moves[self.get_token_value(self.current_token)]
             if(move == ['Synch']):
-                # working_node = self.tree_stack.pop(0)
-                # working_node.parent = None
+                working_node = self.tree_stack.pop(0)
+                working_node.parent = None
                 self.handle_synch_error()
             else:
                 self.apply_rule(move[::-1])
@@ -63,7 +61,8 @@ class Parser:
         self.parse_stack.pop()
         self.parse_stack = self.parse_stack + rule_tokens
         l = self.tree_stack.pop(0)
-        self.tree_stack = [Node(r, parent=l) for r in rule_tokens] + self.tree_stack
+        # print(list(reversed(rule_tokens)))
+        self.tree_stack = [Node(r, parent=l) for r in list(reversed(rule_tokens))] + self.tree_stack
         self.tree_rules.append(rule_tokens[::-1])
 
     def accept_token(self):
@@ -87,6 +86,8 @@ class Parser:
     def handle_terminal_error(self):
         print('TERM ERROR')
         expected_token = self.parse_stack.pop()
+        working_node = self.tree_stack.pop(0)
+        working_node.parent = None
         error = (self.scanner.line_no, 'missing ' + str(expected_token))
         self.errors.append(error)
 
